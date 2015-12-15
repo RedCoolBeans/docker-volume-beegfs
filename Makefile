@@ -10,10 +10,10 @@ fmt:
 	gofmt -s -w -l .
 
 rpm-deps:
+	yum install -y ruby ruby-devel rubygems rpm-build make go git
 	gem install fpm
-	yum install -y rpm-build
 
-rpm: compile
+rpm: compile rpm-deps
 	mkdir -p obj/redhat/usr/bin
 	mkdir -p obj/redhat/lib/systemd/system/
 	install -m 0755 docker-volume-beegfs obj/redhat/usr/bin
