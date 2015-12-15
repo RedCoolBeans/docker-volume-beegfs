@@ -1,9 +1,11 @@
 # docker-volume-beegfs
 
+Docker Volume plugin to create persistent volumes in a BeeGFS cluster.
+
 ## Preconditions
 
 - BeeGFS cluster has to be setup and running
-- `beegfs` kernel module loaded on the host running Docker
+- `beegfs-client` service needs to be running on the Docker host
 
 ## Installation
 
@@ -41,6 +43,10 @@ Inspect the volume:
 Remove the volume (note that this will _not_ remove the actual data):
 
   docker volume rm postgres-portroach
+
+## Caveats
+
+- Currently the plugin assumes the BeeGFS share is mounted on `/mnt/beegfs`
 
 ## Roadmap
 
