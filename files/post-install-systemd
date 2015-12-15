@@ -1,0 +1,2 @@
+# Enable service
+systemctl enable docker-volume-beegfs.service

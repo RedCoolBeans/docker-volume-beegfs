@@ -1,0 +1,11 @@
+[Unit]
+Description=Docker Volume Plugin for BeeGFS
+Documentation=https://github.com/RedCoolBeans/docker-volume-beegfs
+After=beegfs-client.service
+Requires=beegfs-client.service
+
+[Service]
+ExecStart=/usr/bin/docker-volume-beegfs
+
+[Install]
+WantedBy=multi-user.target
