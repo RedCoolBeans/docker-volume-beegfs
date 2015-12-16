@@ -4,8 +4,6 @@ import (
 	"flag"
 	"fmt"
 	log "github.com/Sirupsen/logrus"
-	// "os"
-	// "path/filepath"
 
 	"github.com/calavera/dkvolume"
 )
