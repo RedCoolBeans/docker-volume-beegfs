@@ -17,7 +17,7 @@ An rpm can be built with:
 
 Then install and start the service:
 
-    rpm -i docker-volume-beegfs-$VERSION.rpm
+    yum localinstall docker-volume-beegfs-$VERSION.rpm
     systemctl start docker-volume-beegfs
 
 ### Others
