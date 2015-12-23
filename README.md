@@ -1,6 +1,6 @@
 # docker-volume-beegfs
 
-Docker Volume plugin to create persistent volumes in a BeeGFS cluster.
+Docker Volume plugin to create persistent volumes in a [BeeGFS](http://www.beegfs.com/content/) cluster.
 
 ## Preconditions
 
