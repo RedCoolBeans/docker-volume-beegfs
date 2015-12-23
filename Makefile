@@ -1,4 +1,4 @@
-all: deps
+all: deps compile
 
 compile:
 	go build
