@@ -69,6 +69,8 @@ func (b beegfsDriver) Unmount(r dkvolume.Request) dkvolume.Response {
 }
 
 func volumeDir(b beegfsDriver, r dkvolume.Request) string {
+	// We should use a per volume type to keep track of their individual roots.
+	// Then we can use r.Options["beegfsbase"]
 	return filepath.Join(b.root, r.Name)
 }
 
@@ -83,7 +85,9 @@ func isbeegfs(volumepath string) bool {
 		return false
 	}
 
-        // BEEGFS_MAGIC 0x19830326
+	log.Debugf("Type for %s: %d", volumepath, stat.Type)
+
+	// BEEGFS_MAGIC 0x19830326
 	return stat.Type == int64(428016422)
 }
 
