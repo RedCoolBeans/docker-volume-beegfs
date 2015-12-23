@@ -6,20 +6,13 @@ import (
 	"os"
 	"path"
 	"path/filepath"
-	"sync"
 	"syscall"
 
 	"github.com/calavera/dkvolume"
 )
 
-// unused for the moment -- ought to be used by 'docker volume create [...] --opt beegfsbaseOpt=bla
-const (
-	beegfsbaseOpt = "/mnt/beegfs"
-)
-
 type beegfsDriver struct {
 	root string
-	m    *sync.Mutex
 }
 
 func newBeeGFSDriver(root string) beegfsDriver {
