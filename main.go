@@ -11,7 +11,7 @@ import (
 var (
 	// This is the path in beegfs-mounts.conf
 	root    = flag.String("root", "/mnt/beegfs", "Base directory where volumes are created in the cluster")
-	verbose = flag.Bool("verbose", true, "Enable verbose logging")
+	verbose = flag.Bool("verbose", false, "Enable verbose logging")
 )
 
 func main() {

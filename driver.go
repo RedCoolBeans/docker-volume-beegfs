@@ -24,7 +24,7 @@ func newBeeGFSDriver(root string) beegfsDriver {
 }
 
 func (b beegfsDriver) Create(r dkvolume.Request) dkvolume.Response {
-	log.Debugf("Create: %s, %v", r.Name, r.Options)
+	log.Infof("Create: %s, %v", r.Name, r.Options)
 	dest := volumeDir(b, r)
 
 	if !isbeegfs(dest) {
@@ -41,7 +41,7 @@ func (b beegfsDriver) Create(r dkvolume.Request) dkvolume.Response {
 }
 
 func (b beegfsDriver) Remove(r dkvolume.Request) dkvolume.Response {
-	log.Debugf("Remove: %s", r.Name)
+	log.Infof("Remove: %s", r.Name)
 	return dkvolume.Response{}
 }
 
@@ -51,7 +51,7 @@ func (b beegfsDriver) Path(r dkvolume.Request) dkvolume.Response {
 }
 
 func (b beegfsDriver) Mount(r dkvolume.Request) dkvolume.Response {
-	log.Debugf("Mount: %s", r.Name)
+	log.Infof("Mount: %s", r.Name)
 	dest := volumeDir(b, r)
 
 	if !isbeegfs(dest) {
@@ -64,7 +64,7 @@ func (b beegfsDriver) Mount(r dkvolume.Request) dkvolume.Response {
 }
 
 func (b beegfsDriver) Unmount(r dkvolume.Request) dkvolume.Response {
-	log.Debugf("Unmount: %s", r.Name)
+	log.Infof("Unmount: %s", r.Name)
 	return dkvolume.Response{}
 }
 
