@@ -1,4 +1,5 @@
 *~
 docker-volume-beegfs
 *.rpm
+*.deb
 obj

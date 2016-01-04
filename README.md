@@ -20,6 +20,19 @@ Then install and start the service:
     yum localinstall docker-volume-beegfs-$VERSION.rpm
     systemctl start docker-volume-beegfs
 
+### Debian 8
+
+Debian packages are currently built on a RedHat system, but the `Makefile`
+describes which packages to install on Debian when building from scratch.
+Building the actual package can be done on a Debian system without Makefile modifications:
+
+    make deb
+
+Now you can install and start the service:
+
+    dpkg -i docker-volume-beegfs_$VERSION.deb
+    systemctl start docker-volume-beegfs
+
 ### Others
 
 Build the plugin:
