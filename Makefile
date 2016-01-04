@@ -41,3 +41,5 @@ deb: compile deb-deps
 
 clean:
 	rm -fr obj *.deb *.rpm docker-volume-beegfs
+
+.PHONY: clean rpm-deps deb-deps fmt deps compile
