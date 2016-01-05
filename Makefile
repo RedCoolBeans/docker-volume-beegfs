@@ -9,6 +9,8 @@ deps:
 fmt:
 	gofmt -s -w -l .
 
+dist: rpm deb
+
 rpm-deps:
 	yum install -y ruby ruby-devel rubygems rpm-build make go git
 	gem install fpm
