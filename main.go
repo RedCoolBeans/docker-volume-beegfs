@@ -5,7 +5,7 @@ import (
 	"fmt"
 	log "github.com/Sirupsen/logrus"
 
-	"github.com/calavera/dkvolume"
+	"github.com/docker/go-plugins-helpers/volume"
 )
 
 var (
@@ -24,6 +24,6 @@ func main() {
 	}
 
 	d := newBeeGFSDriver(*root)
-	h := dkvolume.NewHandler(d)
+	h := volume.NewHandler(d)
 	fmt.Println(h.ServeUnix("root", "beegfs"))
 }

@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"syscall"
 
-	"github.com/calavera/dkvolume"
+	"github.com/docker/go-plugins-helpers/volume"
 )
 
 type beegfsDriver struct {
@@ -23,52 +23,52 @@ func newBeeGFSDriver(root string) beegfsDriver {
 	return d
 }
 
-func (b beegfsDriver) Create(r dkvolume.Request) dkvolume.Response {
+func (b beegfsDriver) Create(r volume.Request) volume.Response {
 	log.Infof("Create: %s, %v", r.Name, r.Options)
 	dest := volumeDir(b, r)
 
 	if !isbeegfs(dest) {
 		emsg := fmt.Sprintf("Cannot create volume %s as it's not on a BeeGFS filesystem", dest)
 		log.Error(emsg)
-		return dkvolume.Response{Err: emsg}
+		return volume.Response{Err: emsg}
 	}
 
 	if err := createDest(dest); err != nil {
-		return dkvolume.Response{Err: err.Error()}
+		return volume.Response{Err: err.Error()}
 	}
 
-	return dkvolume.Response{}
+	return volume.Response{}
 }
 
-func (b beegfsDriver) Remove(r dkvolume.Request) dkvolume.Response {
+func (b beegfsDriver) Remove(r volume.Request) volume.Response {
 	log.Infof("Remove: %s", r.Name)
-	return dkvolume.Response{}
+	return volume.Response{}
 }
 
-func (b beegfsDriver) Path(r dkvolume.Request) dkvolume.Response {
+func (b beegfsDriver) Path(r volume.Request) volume.Response {
 	log.Debugf("Path: %s", r.Name)
-	return dkvolume.Response{Mountpoint: volumeDir(b, r)}
+	return volume.Response{Mountpoint: volumeDir(b, r)}
 }
 
-func (b beegfsDriver) Mount(r dkvolume.Request) dkvolume.Response {
+func (b beegfsDriver) Mount(r volume.Request) volume.Response {
 	log.Infof("Mount: %s", r.Name)
 	dest := volumeDir(b, r)
 
 	if !isbeegfs(dest) {
 		emsg := fmt.Sprintf("Cannot mount volume %s as it's not on a BeeGFS filesystem", dest)
 		log.Error(emsg)
-		return dkvolume.Response{Err: emsg}
+		return volume.Response{Err: emsg}
 	}
 
-	return dkvolume.Response{Mountpoint: dest}
+	return volume.Response{Mountpoint: dest}
 }
 
-func (b beegfsDriver) Unmount(r dkvolume.Request) dkvolume.Response {
+func (b beegfsDriver) Unmount(r volume.Request) volume.Response {
 	log.Infof("Unmount: %s", r.Name)
-	return dkvolume.Response{}
+	return volume.Response{}
 }
 
-func volumeDir(b beegfsDriver, r dkvolume.Request) string {
+func volumeDir(b beegfsDriver, r volume.Request) string {
 	// We should use a per volume type to keep track of their individual roots.
 	// Then we can use r.Options["beegfsbase"]
 	return filepath.Join(b.root, r.Name)
