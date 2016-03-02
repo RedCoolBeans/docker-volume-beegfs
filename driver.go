@@ -68,6 +68,21 @@ func (b beegfsDriver) Unmount(r volume.Request) volume.Response {
 	return volume.Response{}
 }
 
+func (b beegfsDriver) Get(r volume.Request) volume.Response {
+	log.Info("Get: %s", r.Name)
+	return volume.Response{
+		Volume: &volume.Volume{
+			Name:       r.Name,
+			Mountpoint: volumeDir(b, r),
+		},
+	}
+}
+
+func (b beegfsDriver) List(r volume.Request) volume.Response {
+	log.Info("List %v", r)
+	return volume.Response{}
+}
+
 func volumeDir(b beegfsDriver, r volume.Request) string {
 	// We should use a per volume type to keep track of their individual roots.
 	// Then we can use r.Options["beegfsbase"]
