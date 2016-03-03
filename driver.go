@@ -6,18 +6,24 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"sync"
 	"syscall"
 
 	"github.com/docker/go-plugins-helpers/volume"
+	"github.com/davecgh/go-spew/spew"
 )
 
 type beegfsDriver struct {
-	root string
+	root    string
+	volumes map[string]string
+	m       *sync.Mutex
 }
 
 func newBeeGFSDriver(root string) beegfsDriver {
 	d := beegfsDriver{
-		root: root,
+		root:    root,
+		volumes: make(map[string]string),
+		m:       &sync.Mutex{},
 	}
 
 	return d
@@ -25,6 +31,10 @@ func newBeeGFSDriver(root string) beegfsDriver {
 
 func (b beegfsDriver) Create(r volume.Request) volume.Response {
 	log.Infof("Create: %s, %v", r.Name, r.Options)
+
+	b.m.Lock()
+	defer b.m.Unlock()
+
 	dest := volumeDir(b, r)
 
 	if !isbeegfs(dest) {
@@ -33,8 +43,22 @@ func (b beegfsDriver) Create(r volume.Request) volume.Response {
 		return volume.Response{Err: emsg}
 	}
 
+	if _, ok := b.volumes[r.Name]; ok {
+		imsg := fmt.Sprintf("Cannot create volume %s, it already exists", dest)
+		log.Info(imsg)
+		return volume.Response{}
+	}
+
+	volumePath := volumeDir(b, r)
+
 	if err := createDest(dest); err != nil {
 		return volume.Response{Err: err.Error()}
+	}
+
+	b.volumes[r.Name] = volumePath
+
+	if *verbose {
+		spew.Dump(b.volumes)
 	}
 
 	return volume.Response{}
@@ -42,12 +66,25 @@ func (b beegfsDriver) Create(r volume.Request) volume.Response {
 
 func (b beegfsDriver) Remove(r volume.Request) volume.Response {
 	log.Infof("Remove: %s", r.Name)
+
+	b.m.Lock()
+	defer b.m.Unlock()
+
+	if _, ok := b.volumes[r.Name]; ok {
+		delete(b.volumes, r.Name)
+	}
+
 	return volume.Response{}
 }
 
 func (b beegfsDriver) Path(r volume.Request) volume.Response {
 	log.Debugf("Path: %s", r.Name)
-	return volume.Response{Mountpoint: volumeDir(b, r)}
+
+	if volumePath, ok := b.volumes[r.Name]; ok {
+		return volume.Response{Mountpoint: volumePath}
+	}
+
+	return volume.Response{}
 }
 
 func (b beegfsDriver) Mount(r volume.Request) volume.Response {
@@ -60,7 +97,11 @@ func (b beegfsDriver) Mount(r volume.Request) volume.Response {
 		return volume.Response{Err: emsg}
 	}
 
-	return volume.Response{Mountpoint: dest}
+	if volumePath, ok := b.volumes[r.Name]; ok {
+		return volume.Response{Mountpoint: volumePath}
+	}
+
+	return volume.Response{}
 }
 
 func (b beegfsDriver) Unmount(r volume.Request) volume.Response {
@@ -69,18 +110,30 @@ func (b beegfsDriver) Unmount(r volume.Request) volume.Response {
 }
 
 func (b beegfsDriver) Get(r volume.Request) volume.Response {
-	log.Info("Get: %s", r.Name)
-	return volume.Response{
-		Volume: &volume.Volume{
-			Name:       r.Name,
-			Mountpoint: volumeDir(b, r),
-		},
+	log.Infof("Get: %s", r.Name)
+
+	if volumePath, ok := b.volumes[r.Name]; ok {
+		return volume.Response{
+			Volume: &volume.Volume{
+				Name:       r.Name,
+				Mountpoint: volumePath,
+			},
+		}
 	}
+
+	return volume.Response{Err: fmt.Sprintf("volume %s unknown", r.Name)}
 }
 
 func (b beegfsDriver) List(r volume.Request) volume.Response {
-	log.Info("List %v", r)
-	return volume.Response{}
+	log.Infof("List %v", r)
+
+	volumes := []*volume.Volume{}
+
+	for name, path := range b.volumes {
+		volumes = append(volumes, &volume.Volume{Name: name, Mountpoint: path})
+	}
+
+	return volume.Response{Volumes: volumes}
 }
 
 func volumeDir(b beegfsDriver, r volume.Request) string {
