@@ -9,8 +9,8 @@ import (
 	"sync"
 	"syscall"
 
-	"github.com/docker/go-plugins-helpers/volume"
 	"github.com/davecgh/go-spew/spew"
+	"github.com/docker/go-plugins-helpers/volume"
 )
 
 type beegfsDriver struct {
