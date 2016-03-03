@@ -1,0 +1,13 @@
+# 0.2.0
+
+- Migrate to go-plugin-helpers/volume
+- Support for Docker 1.10 API
+
+# 0.1.1
+
+- logging is much more silent by default (toggle with `-verbose=true`)
+- .deb package for systemd-based Debian-like distributions (e.g. Debian 8)
+
+# 0.1.0
+
+Initial public release

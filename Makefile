@@ -22,7 +22,7 @@ rpm: compile rpm-deps
 	install -m 0644 docker-volume-beegfs.service obj/redhat/lib/systemd/system
 	fpm -C obj/redhat --vendor RedCoolBeans -m "info@redcoolbeans.com" -f \
 		-s dir -t rpm -n docker-volume-beegfs \
-		--after-install files/post-install-systemd --version 0.1.0 . && \
+		--after-install files/post-install-systemd --version 0.2.0 . && \
 		rm -fr obj/redhat
 
 # builds are done on RHEL, when building locally on Debian use the following:
@@ -38,7 +38,7 @@ deb: compile deb-deps
 	install -m 0644 docker-volume-beegfs.service obj/debian/lib/systemd/system
 	fpm -C obj/debian --vendor RedCoolBeans -m "info@redcoolbeans.com" -f \
 		-s dir -t deb -n docker-volume-beegfs \
-		--after-install files/post-install-systemd --version 0.1.0 . && \
+		--after-install files/post-install-systemd --version 0.2.0 . && \
 		rm -fr obj/debian
 
 clean:
