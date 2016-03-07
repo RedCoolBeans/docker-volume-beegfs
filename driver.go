@@ -13,16 +13,21 @@ import (
 	"github.com/docker/go-plugins-helpers/volume"
 )
 
+// A single volume instance
+type beegfsMount struct {
+	name string
+	path string
+	root string
+}
+
 type beegfsDriver struct {
-	root    string
-	volumes map[string]string
+	mounts  map[string]*beegfsMount
 	m       *sync.Mutex
 }
 
 func newBeeGFSDriver(root string) beegfsDriver {
 	d := beegfsDriver{
-		root:    root,
-		volumes: make(map[string]string),
+		mounts:  make(map[string]*beegfsMount),
 		m:       &sync.Mutex{},
 	}
 
@@ -30,35 +35,51 @@ func newBeeGFSDriver(root string) beegfsDriver {
 }
 
 func (b beegfsDriver) Create(r volume.Request) volume.Response {
+	var volumeRoot string
+
 	log.Infof("Create: %s, %v", r.Name, r.Options)
 
 	b.m.Lock()
 	defer b.m.Unlock()
 
-	dest := volumeDir(b, r)
+	// Handle options (unrecognized options are silently ignored):
+	// root: directory to create new volumes (this should correspond with
+	//       beegfs-mounts.conf).
+	if optsRoot, ok := r.Options["root"]; ok {
+		volumeRoot = optsRoot
+	} else {
+		// Assume the default root
+		volumeRoot = *root
+	}
 
+	dest := filepath.Join(volumeRoot, r.Name)
 	if !isbeegfs(dest) {
 		emsg := fmt.Sprintf("Cannot create volume %s as it's not on a BeeGFS filesystem", dest)
 		log.Error(emsg)
 		return volume.Response{Err: emsg}
 	}
 
-	if _, ok := b.volumes[r.Name]; ok {
+	fmt.Printf("mounts: %d", len(b.mounts))
+	if _, ok := b.mounts[r.Name]; ok {
 		imsg := fmt.Sprintf("Cannot create volume %s, it already exists", dest)
 		log.Info(imsg)
 		return volume.Response{}
 	}
 
-	volumePath := volumeDir(b, r)
+	volumePath := filepath.Join(volumeRoot, r.Name)
 
 	if err := createDest(dest); err != nil {
 		return volume.Response{Err: err.Error()}
 	}
 
-	b.volumes[r.Name] = volumePath
+	b.mounts[r.Name] = &beegfsMount {
+		name: r.Name,
+		path: volumePath,
+		root: volumeRoot,
+	}
 
 	if *verbose {
-		spew.Dump(b.volumes)
+		spew.Dump(b.mounts)
 	}
 
 	return volume.Response{}
@@ -70,8 +91,8 @@ func (b beegfsDriver) Remove(r volume.Request) volume.Response {
 	b.m.Lock()
 	defer b.m.Unlock()
 
-	if _, ok := b.volumes[r.Name]; ok {
-		delete(b.volumes, r.Name)
+	if _, ok := b.mounts[r.Name]; ok {
+		delete(b.mounts, r.Name)
 	}
 
 	return volume.Response{}
@@ -80,8 +101,8 @@ func (b beegfsDriver) Remove(r volume.Request) volume.Response {
 func (b beegfsDriver) Path(r volume.Request) volume.Response {
 	log.Debugf("Path: %s", r.Name)
 
-	if volumePath, ok := b.volumes[r.Name]; ok {
-		return volume.Response{Mountpoint: volumePath}
+	if _, ok := b.mounts[r.Name]; ok {
+		return volume.Response{Mountpoint: b.mounts[r.Name].path}
 	}
 
 	return volume.Response{}
@@ -89,7 +110,7 @@ func (b beegfsDriver) Path(r volume.Request) volume.Response {
 
 func (b beegfsDriver) Mount(r volume.Request) volume.Response {
 	log.Infof("Mount: %s", r.Name)
-	dest := volumeDir(b, r)
+	dest := filepath.Join(b.mounts[r.Name].root, r.Name)
 
 	if !isbeegfs(dest) {
 		emsg := fmt.Sprintf("Cannot mount volume %s as it's not on a BeeGFS filesystem", dest)
@@ -97,8 +118,8 @@ func (b beegfsDriver) Mount(r volume.Request) volume.Response {
 		return volume.Response{Err: emsg}
 	}
 
-	if volumePath, ok := b.volumes[r.Name]; ok {
-		return volume.Response{Mountpoint: volumePath}
+	if _, ok := b.mounts[r.Name]; ok {
+		return volume.Response{Mountpoint: b.mounts[r.Name].path}
 	}
 
 	return volume.Response{}
@@ -112,11 +133,11 @@ func (b beegfsDriver) Unmount(r volume.Request) volume.Response {
 func (b beegfsDriver) Get(r volume.Request) volume.Response {
 	log.Infof("Get: %s", r.Name)
 
-	if volumePath, ok := b.volumes[r.Name]; ok {
+	if v, ok := b.mounts[r.Name]; ok {
 		return volume.Response{
 			Volume: &volume.Volume{
-				Name:       r.Name,
-				Mountpoint: volumePath,
+				Name:       v.name,
+				Mountpoint: v.path,
 			},
 		}
 	}
@@ -129,17 +150,11 @@ func (b beegfsDriver) List(r volume.Request) volume.Response {
 
 	volumes := []*volume.Volume{}
 
-	for name, path := range b.volumes {
-		volumes = append(volumes, &volume.Volume{Name: name, Mountpoint: path})
+	for v := range b.mounts {
+		volumes = append(volumes, &volume.Volume{Name: b.mounts[v].name, Mountpoint: b.mounts[v].path})
 	}
 
 	return volume.Response{Volumes: volumes}
-}
-
-func volumeDir(b beegfsDriver, r volume.Request) string {
-	// We should use a per volume type to keep track of their individual roots.
-	// Then we can use r.Options["beegfsbase"]
-	return filepath.Join(b.root, r.Name)
 }
 
 // Check if the parent directory (where the volume will be created)
