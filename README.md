@@ -57,13 +57,19 @@ Remove the volume (note that this will _not_ remove the actual data):
 
     docker volume rm postgres-portroach
 
-## Caveats
+### Non-default mount points
 
-- Currently the plugin assumes the BeeGFS share is mounted on `/mnt/beegfs`
+By default BeeGFS uses `/mnt/beegfs` as the mount point (as configured in
+`beegfs-mounts.conf`), and this plugin does too. For non-standard mount points
+you can specify an alternate root when creating a new volume:
+
+    docker volume create -d beegfs --name b3 -o root=/stor/b3
+
+Other options are currently silently ignored.
 
 ## Roadmap
 
-- Support options passed at `docker volume create`
+- No outstanding features/requests.
 
 ## License
 
