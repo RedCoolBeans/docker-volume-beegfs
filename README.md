@@ -9,6 +9,8 @@ Docker Volume plugin to create persistent volumes in a [BeeGFS](http://www.beegf
 
 ## Installation
 
+A pre-built binary as well as `rpm` and `deb` packages are available from the [releases](https://github.com/RedCoolBeans/docker-volume-beegfs/releases) page.
+
 ### RedHat/CentOS 7
 
 An rpm can be built with:
