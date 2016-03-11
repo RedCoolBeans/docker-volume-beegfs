@@ -41,7 +41,7 @@ Build the plugin:
 
 ## Usage
 
-First create a volume (no additional options are supported yet):
+First create a volume:
 
     docker volume create -d beegfs --name postgres-portroach
 
