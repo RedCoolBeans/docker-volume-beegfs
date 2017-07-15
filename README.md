@@ -35,7 +35,15 @@ Now you can install and start the service:
     dpkg -i docker-volume-beegfs_$VERSION.deb
     systemctl start docker-volume-beegfs
 
-### Others
+### From source code
+
+The plugin uses [govendor](https://github.com/kardianos/govendor) to manage dependencies.
+
+    go get -u github.com/kardianos/govendor
+
+Restore dependencies:
+    
+    govendor sync
 
 Build the plugin:
 

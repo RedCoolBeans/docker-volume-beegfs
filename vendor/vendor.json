@@ -1,0 +1,85 @@
+{
+	"comment": "",
+	"ignore": "",
+	"package": [
+		{
+			"checksumSHA1": "+yzJjATeaGRYi77nZJgZm0ZvAN8=",
+			"path": "github.com/Microsoft/go-winio",
+			"revision": "c4dc1301f1dc0307acd38e611aa375a64dfe0642",
+			"revisionTime": "2017-07-12T04:46:15Z"
+		},
+		{
+			"checksumSHA1": "BfvuOnSnlAXPOAZUa3J188NjYH8=",
+			"path": "github.com/Sirupsen/logrus",
+			"revision": "51dc0fc64317a2861273909081f9c315786533eb",
+			"revisionTime": "2017-07-13T11:57:24Z"
+		},
+		{
+			"checksumSHA1": "jZW0YmSE2j+316qebIB/FcrVZ6s=",
+			"path": "github.com/coreos/go-systemd/activation",
+			"revision": "24036eb3df68550d24a2736c5d013f4e83366866",
+			"revisionTime": "2017-06-09T14:46:27Z"
+		},
+		{
+			"checksumSHA1": "0y5phFHOrFHf/2w+q/E4FZHQXVI=",
+			"path": "github.com/davecgh/go-spew/spew",
+			"revision": "adab96458c51a58dc1783b3335dcce5461522e75",
+			"revisionTime": "2017-07-11T18:34:51Z"
+		},
+		{
+			"checksumSHA1": "a2yC46a1qsJomgY6rb+FkTFiqmE=",
+			"path": "github.com/davecgh/go-spew/spew/testdata",
+			"revision": "adab96458c51a58dc1783b3335dcce5461522e75",
+			"revisionTime": "2017-07-11T18:34:51Z"
+		},
+		{
+			"checksumSHA1": "f6yrnwXO2t4Lx7bqY1U105fSu2U=",
+			"path": "github.com/docker/go-connections/sockets",
+			"revision": "3ede32e2033de7505e6500d6c868c2b9ed9f169d",
+			"revisionTime": "2017-06-23T20:36:43Z"
+		},
+		{
+			"checksumSHA1": "B+ogl7NoFxawv5DWI1tb3y+rzQg=",
+			"path": "github.com/docker/go-plugins-helpers/sdk",
+			"revision": "abb3e589c0322ddc019c2ec5f587ea0df2024869",
+			"revisionTime": "2017-06-21T09:41:05Z"
+		},
+		{
+			"checksumSHA1": "JU42zJNdlm52BDonHLSy8l1ZsRs=",
+			"path": "github.com/docker/go-plugins-helpers/volume",
+			"revision": "abb3e589c0322ddc019c2ec5f587ea0df2024869",
+			"revisionTime": "2017-06-21T09:41:05Z"
+		},
+		{
+			"checksumSHA1": "RZOdTSZN/PgcTqko5LzIAzw+UT4=",
+			"path": "github.com/pmezard/go-difflib/difflib",
+			"revision": "792786c7400a136282c1664665ae0a8db921c6c2",
+			"revisionTime": "2016-01-10T10:55:54Z"
+		},
+		{
+			"checksumSHA1": "TpQdKdG6Q7yBpMBTecSP6RKj/Iw=",
+			"path": "github.com/stretchr/testify/assert",
+			"revision": "05e8a0eda380579888eb53c394909df027f06991",
+			"revisionTime": "2017-07-13T16:51:06Z"
+		},
+		{
+			"checksumSHA1": "V5+0rhkF5PahTjwDGBaQTMoz1z0=",
+			"path": "golang.org/x/net/proxy",
+			"revision": "f01ecb60fe3835d80d9a0b7b2bf24b228c89260e",
+			"revisionTime": "2017-07-11T11:58:19Z"
+		},
+		{
+			"checksumSHA1": "rNuMGFgygEt+Y8BhFd+DQP3vF9k=",
+			"path": "golang.org/x/sys/unix",
+			"revision": "4cd6d1a821c7175768725b55ca82f14683a29ea4",
+			"revisionTime": "2017-07-14T13:21:52Z"
+		},
+		{
+			"checksumSHA1": "g6REgYaSXbtRNfvEX6HM/hTTz8I=",
+			"path": "golang.org/x/sys/windows",
+			"revision": "4cd6d1a821c7175768725b55ca82f14683a29ea4",
+			"revisionTime": "2017-07-14T13:21:52Z"
+		}
+	],
+	"rootPath": "github.com/RedCoolBeans/docker-volume-beegfs"
+}

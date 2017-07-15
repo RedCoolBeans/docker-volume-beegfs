@@ -6,6 +6,8 @@ import (
 	log "github.com/Sirupsen/logrus"
 
 	"github.com/docker/go-plugins-helpers/volume"
+	"os/user"
+	"strconv"
 )
 
 var (
@@ -23,7 +25,10 @@ func main() {
 		log.SetLevel(log.InfoLevel)
 	}
 
+	u, _ := user.Lookup("root")
+	gid, _ := strconv.Atoi(u.Gid)
+
 	d := newBeeGFSDriver(*root)
 	h := volume.NewHandler(d)
-	fmt.Println(h.ServeUnix("root", "beegfs"))
+	fmt.Println(h.ServeUnix("beegfs", gid))
 }
