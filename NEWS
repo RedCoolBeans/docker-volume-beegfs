@@ -1,3 +1,9 @@
+# 0.4.0
+
+- Support for latest version of Docker
+- Does need Go 1.8.1
+- Implementation of capabilities
+
 # 0.2.0
 
 - Migrate to go-plugin-helpers/volume
