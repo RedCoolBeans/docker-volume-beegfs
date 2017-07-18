@@ -108,7 +108,7 @@ func (b beegfsDriver) Path(r volume.Request) volume.Response {
 	return volume.Response{}
 }
 
-func (b beegfsDriver) Mount(r volume.Request) volume.Response {
+func (b beegfsDriver) Mount(r volume.MountRequest) volume.Response {
 	log.Infof("Mount: %s", r.Name)
 	dest := filepath.Join(b.mounts[r.Name].root, r.Name)
 
@@ -125,7 +125,7 @@ func (b beegfsDriver) Mount(r volume.Request) volume.Response {
 	return volume.Response{}
 }
 
-func (b beegfsDriver) Unmount(r volume.Request) volume.Response {
+func (b beegfsDriver) Unmount(r volume.UnmountRequest) volume.Response {
 	log.Infof("Unmount: %s", r.Name)
 	return volume.Response{}
 }
@@ -157,6 +157,12 @@ func (b beegfsDriver) List(r volume.Request) volume.Response {
 	return volume.Response{Volumes: volumes}
 }
 
+func (d beegfsDriver) Capabilities(r volume.Request) volume.Response {
+	var res volume.Response
+	res.Capabilities = volume.Capability{Scope: "global"}
+	return res
+}
+
 // Check if the parent directory (where the volume will be created)
 // is of type 'beegfs' using the BEEGFS_MAGIC value.
 func isbeegfs(volumepath string) bool {
@@ -171,7 +177,7 @@ func isbeegfs(volumepath string) bool {
 	log.Debugf("Type for %s: %d", volumepath, stat.Type)
 
 	// BEEGFS_MAGIC 0x19830326
-	return stat.Type == int64(428016422)
+	return stat.Type == 428016422
 }
 
 func createDest(dest string) error {

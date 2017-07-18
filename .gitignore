@@ -3,3 +3,5 @@ docker-volume-beegfs
 *.rpm
 *.deb
 obj
+.idea
+vendor/*/
