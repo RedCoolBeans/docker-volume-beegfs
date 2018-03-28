@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	log "github.com/Sirupsen/logrus"
 	"os"
@@ -34,7 +35,7 @@ func newBeeGFSDriver(root string) beegfsDriver {
 	return d
 }
 
-func (b beegfsDriver) Create(r volume.Request) volume.Response {
+func (b beegfsDriver) Create(r *volume.CreateRequest) error {
 	var volumeRoot string
 
 	log.Infof("Create: %s, %v", r.Name, r.Options)
@@ -56,20 +57,20 @@ func (b beegfsDriver) Create(r volume.Request) volume.Response {
 	if !isbeegfs(dest) {
 		emsg := fmt.Sprintf("Cannot create volume %s as it's not on a BeeGFS filesystem", dest)
 		log.Error(emsg)
-		return volume.Response{Err: emsg}
+		return errors.New(emsg)
 	}
 
 	fmt.Printf("mounts: %d", len(b.mounts))
 	if _, ok := b.mounts[r.Name]; ok {
 		imsg := fmt.Sprintf("Cannot create volume %s, it already exists", dest)
 		log.Info(imsg)
-		return volume.Response{}
+		return nil
 	}
 
 	volumePath := filepath.Join(volumeRoot, r.Name)
 
 	if err := createDest(dest); err != nil {
-		return volume.Response{Err: err.Error()}
+		return err
 	}
 
 	b.mounts[r.Name] = &beegfsMount {
@@ -82,10 +83,10 @@ func (b beegfsDriver) Create(r volume.Request) volume.Response {
 		spew.Dump(b.mounts)
 	}
 
-	return volume.Response{}
+	return nil
 }
 
-func (b beegfsDriver) Remove(r volume.Request) volume.Response {
+func (b beegfsDriver) Remove(r *volume.RemoveRequest) error {
 	log.Infof("Remove: %s", r.Name)
 
 	b.m.Lock()
@@ -95,58 +96,58 @@ func (b beegfsDriver) Remove(r volume.Request) volume.Response {
 		delete(b.mounts, r.Name)
 	}
 
-	return volume.Response{}
+	return nil
 }
 
-func (b beegfsDriver) Path(r volume.Request) volume.Response {
+func (b beegfsDriver) Path(r *volume.PathRequest) (*volume.PathResponse, error) {
 	log.Debugf("Path: %s", r.Name)
 
 	if _, ok := b.mounts[r.Name]; ok {
-		return volume.Response{Mountpoint: b.mounts[r.Name].path}
+		return &volume.PathResponse{Mountpoint: b.mounts[r.Name].path}, nil
 	}
 
-	return volume.Response{}
+	return nil, nil
 }
 
-func (b beegfsDriver) Mount(r volume.MountRequest) volume.Response {
+func (b beegfsDriver) Mount(r *volume.MountRequest) (*volume.MountResponse, error) {
 	log.Infof("Mount: %s", r.Name)
 	dest := filepath.Join(b.mounts[r.Name].root, r.Name)
 
 	if !isbeegfs(dest) {
 		emsg := fmt.Sprintf("Cannot mount volume %s as it's not on a BeeGFS filesystem", dest)
 		log.Error(emsg)
-		return volume.Response{Err: emsg}
+        return nil, errors.New(emsg)
 	}
 
 	if _, ok := b.mounts[r.Name]; ok {
-		return volume.Response{Mountpoint: b.mounts[r.Name].path}
+		return &volume.MountResponse{Mountpoint: b.mounts[r.Name].path}, nil
 	}
 
-	return volume.Response{}
+	return nil, nil
 }
 
-func (b beegfsDriver) Unmount(r volume.UnmountRequest) volume.Response {
+func (b beegfsDriver) Unmount(r *volume.UnmountRequest) error {
 	log.Infof("Unmount: %s", r.Name)
-	return volume.Response{}
+	return nil
 }
 
-func (b beegfsDriver) Get(r volume.Request) volume.Response {
+func (b beegfsDriver) Get(r *volume.GetRequest) (*volume.GetResponse, error) {
 	log.Infof("Get: %s", r.Name)
 
 	if v, ok := b.mounts[r.Name]; ok {
-		return volume.Response{
+		return &volume.GetResponse{
 			Volume: &volume.Volume{
 				Name:       v.name,
 				Mountpoint: v.path,
 			},
-		}
+		}, nil
 	}
 
-	return volume.Response{Err: fmt.Sprintf("volume %s unknown", r.Name)}
+	return nil, errors.New(fmt.Sprintf("volume %s unknown", r.Name))
 }
 
-func (b beegfsDriver) List(r volume.Request) volume.Response {
-	log.Infof("List %v", r)
+func (b beegfsDriver) List() (*volume.ListResponse, error) {
+	log.Infof("List")
 
 	volumes := []*volume.Volume{}
 
@@ -154,13 +155,15 @@ func (b beegfsDriver) List(r volume.Request) volume.Response {
 		volumes = append(volumes, &volume.Volume{Name: b.mounts[v].name, Mountpoint: b.mounts[v].path})
 	}
 
-	return volume.Response{Volumes: volumes}
+	return &volume.ListResponse{Volumes: volumes}, nil
 }
 
-func (d beegfsDriver) Capabilities(r volume.Request) volume.Response {
-	var res volume.Response
-	res.Capabilities = volume.Capability{Scope: "global"}
-	return res
+func (d beegfsDriver) Capabilities() *volume.CapabilitiesResponse {
+    return &volume.CapabilitiesResponse{
+        Capabilities: volume.Capability{
+            Scope: "global",
+        },
+    }
 }
 
 // Check if the parent directory (where the volume will be created)
